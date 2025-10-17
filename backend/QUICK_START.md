@@ -202,7 +202,7 @@ backend/
 │   ├── views.py           # Employee views
 │   ├── urls.py            # Employee endpoints
 │   └── admin.py           # Employee admin
-├── employee_management/   # Main project settings
+├── main/                  # Main project settings
 │   ├── settings.py        # Django settings
 │   ├── urls.py            # Main URL config
 │   └── wsgi.py            # WSGI config

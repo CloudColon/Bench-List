@@ -305,7 +305,7 @@ backend/
 ├── .gitignore                    # Updated to protect .env
 ├── requirements.txt              # Updated with PostgreSQL packages
 ├── manage.py
-├── employee_management/
+├── main/
 │   ├── settings.py              # Updated with PostgreSQL support
 │   └── ...
 ├── accounts/

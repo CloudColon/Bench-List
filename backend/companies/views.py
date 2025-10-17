@@ -18,12 +18,16 @@ class CompanyViewSet(viewsets.ModelViewSet):
     
     def get_queryset(self):
         """Filter companies based on user role"""
+        # Return base queryset for schema generation
+        if getattr(self, 'swagger_fake_view', False):
+            return Company.objects.none()
+
         user = self.request.user
-        
+
         # Admins can see all companies
         if user.role == 'admin':
             return Company.objects.all()
-        
+
         # Regular users can only see their own companies
         return Company.objects.filter(admin_user=user)
     

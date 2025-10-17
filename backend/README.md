@@ -206,7 +206,7 @@ backend/
 ├── accounts/               # User authentication and management
 ├── companies/              # Company management
 ├── employees/              # Employee and bench request management
-├── employee_management/    # Main project settings
+├── main/                   # Main project settings and configuration
 ├── media/                  # Uploaded files (resumes)
 ├── manage.py
 └── requirements.txt

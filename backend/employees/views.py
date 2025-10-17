@@ -32,25 +32,29 @@ class EmployeeViewSet(viewsets.ModelViewSet):
     
     def get_queryset(self):
         """Filter employees based on user role and query parameters"""
+        # Return base queryset for schema generation
+        if getattr(self, 'swagger_fake_view', False):
+            return Employee.objects.none()
+
         user = self.request.user
         queryset = Employee.objects.select_related('company')
-        
+
         # Filter by status if provided
         status_param = self.request.query_params.get('status', None)
         if status_param:
             queryset = queryset.filter(status=status_param)
-        
+
         # Filter by company if user is not admin
         if user.role != 'admin':
             # Users can only see employees from their own companies
             user_companies = user.managed_companies.all()
             queryset = queryset.filter(company__in=user_companies)
-        
+
         # Filter by experience level if provided
         experience_level = self.request.query_params.get('experience_level', None)
         if experience_level:
             queryset = queryset.filter(experience_level=experience_level)
-        
+
         return queryset.filter(is_active=True)
     
     @action(detail=False, methods=['get'])
@@ -76,9 +80,13 @@ class BenchRequestViewSet(viewsets.ModelViewSet):
     
     def get_queryset(self):
         """Filter bench requests based on user's companies"""
+        # Return base queryset for schema generation
+        if getattr(self, 'swagger_fake_view', False):
+            return BenchRequest.objects.none()
+
         user = self.request.user
         user_companies = user.managed_companies.all()
-        
+
         # Get requests related to user's companies
         # Either as requesting company or as employee's company
         queryset = BenchRequest.objects.filter(
@@ -86,7 +94,7 @@ class BenchRequestViewSet(viewsets.ModelViewSet):
         ) | BenchRequest.objects.filter(
             employee__company__in=user_companies
         )
-        
+
         return queryset.select_related('employee', 'requesting_company', 'employee__company')
     
     @action(detail=True, methods=['post'])

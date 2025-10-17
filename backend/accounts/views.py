@@ -31,6 +31,10 @@ class UserViewSet(viewsets.ModelViewSet):
     
     def get_queryset(self):
         """Filter users based on role"""
+        # Return base queryset for schema generation
+        if getattr(self, 'swagger_fake_view', False):
+            return User.objects.none()
+
         user = self.request.user
         if user.role == 'admin':
             return User.objects.all()

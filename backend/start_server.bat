@@ -1,5 +1,7 @@
 @echo off
-echo Starting Employee Management System Backend...
+echo ========================================
+echo Employee Management System Backend
+echo ========================================
 echo.
 
 REM Check if virtual environment is activated
@@ -11,14 +13,29 @@ if %errorlevel% neq 0 (
 )
 
 REM Run migrations
-echo Running database migrations...
+echo [1/3] Running database migrations...
 python manage.py migrate
+echo.
 
 REM Start the development server
+echo [2/3] Starting Django development server...
 echo.
-echo Starting Django development server...
-echo Server will be available at http://localhost:8000
-echo Admin panel: http://localhost:8000/admin/
-echo API Documentation: See API_DOCUMENTATION.md
+echo ========================================
+echo Server is starting...
+echo ========================================
+echo.
+echo 📍 Access Points:
+echo   - Swagger UI: http://localhost:8000/swagger/
+echo   - ReDoc: http://localhost:8000/redoc/
+echo   - Admin Panel: http://localhost:8000/admin/
+echo   - API Base: http://localhost:8000/api/
+echo.
+echo 📖 Documentation:
+echo   - SWAGGER_GUIDE.md - Interactive API testing guide
+echo   - API_DOCUMENTATION.md - Complete API reference
+echo   - QUICK_START.md - Quick start guide
+echo.
+echo Press Ctrl+C to stop the server
+echo ========================================
 echo.
 python manage.py runserver

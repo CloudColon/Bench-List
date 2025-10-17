@@ -10,14 +10,43 @@ This is the backend API for the Employee Management System that allows companies
 - **Employee Management**: Register and track bench employees with detailed information
 - **Bench Request System**: Request employees from other companies
 - **RESTful API**: Comprehensive API endpoints for all operations
+- **Swagger/OpenAPI Documentation**: Interactive API testing interface
 
 ## Technology Stack
 
 - Django 5.2.7
 - Django REST Framework
 - JWT Authentication (djangorestframework-simplejwt)
-- SQLite Database (can be changed to PostgreSQL/MySQL)
+- Swagger/OpenAPI (drf-yasg)
+- **PostgreSQL** (recommended) or SQLite for development
 - Python 3.14
+- Environment-based configuration with python-decouple
+
+## Database Options
+
+### PostgreSQL (Recommended for Production)
+✅ Configured and ready to use!
+- Better performance for concurrent access
+- Production-ready
+- Full-text search capabilities
+- See **[POSTGRESQL_SETUP.md](POSTGRESQL_SETUP.md)** for setup instructions
+
+### SQLite (Development)
+- Quick setup for testing
+- No additional installation needed
+- Switch between databases using `.env` file
+
+**Quick Setup:** See [POSTGRESQL_QUICKSTART.md](POSTGRESQL_QUICKSTART.md) for 3-step PostgreSQL setup!
+
+## Quick Start
+
+### Access Interactive API Documentation
+Once the server is running, visit:
+- **Swagger UI**: http://localhost:8000/swagger/
+- **ReDoc**: http://localhost:8000/redoc/
+- **Admin Panel**: http://localhost:8000/admin/
+
+See [SWAGGER_GUIDE.md](SWAGGER_GUIDE.md) for detailed usage instructions.
 
 ## Setup Instructions
 
@@ -27,7 +56,26 @@ This is the backend API for the Employee Management System that allows companies
 pip install -r requirements.txt
 ```
 
-### 2. Configure Database
+### 2. Configure Environment Variables
+
+Copy `.env.example` to `.env` and update with your settings:
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` file:
+```env
+USE_POSTGRES=True  # Set to False to use SQLite
+DB_PASSWORD=your_password
+SECRET_KEY=your-secret-key
+```
+
+### 3. Set Up PostgreSQL (Optional but Recommended)
+
+See [POSTGRESQL_QUICKSTART.md](POSTGRESQL_QUICKSTART.md) or [POSTGRESQL_SETUP.md](POSTGRESQL_SETUP.md) for detailed instructions.
+
+### 4. Run Migrations
 
 Run migrations to set up the database:
 
@@ -36,7 +84,9 @@ python manage.py makemigrations
 python manage.py migrate
 ```
 
-### 3. Create Superuser
+### 5. Create Superuser
+
+### 5. Create Superuser
 
 Create an admin user to access the Django admin panel:
 
@@ -44,11 +94,26 @@ Create an admin user to access the Django admin panel:
 python manage.py createsuperuser
 ```
 
-### 4. Run Development Server
+### 6. Run Development Server
 
 ```bash
 python manage.py runserver
 ```
+
+The API will be available at `http://localhost:8000/`
+
+---
+
+## 📚 Documentation
+
+- **[POSTGRESQL_QUICKSTART.md](POSTGRESQL_QUICKSTART.md)** - 3-step PostgreSQL setup
+- **[POSTGRESQL_SETUP.md](POSTGRESQL_SETUP.md)** - Complete PostgreSQL guide
+- **[SWAGGER_GUIDE.md](SWAGGER_GUIDE.md)** - Interactive API testing guide
+- **[API_DOCUMENTATION.md](API_DOCUMENTATION.md)** - Complete API reference
+- **[TESTING_EXAMPLES.md](TESTING_EXAMPLES.md)** - cURL and Python examples
+- **[QUICK_START.md](QUICK_START.md)** - Quick start guide
+
+---
 
 The API will be available at `http://localhost:8000/`
 

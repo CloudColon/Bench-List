@@ -37,12 +37,18 @@ media/
 
 # Environment variables
 .env
+.env.local
+.env.*.local
 .venv
 env/
 venv/
 ENV/
 env.bak/
 venv.bak/
+
+# Environment variables (IMPORTANT: Never commit these!)
+*.env
+!.env.example
 
 # IDEs
 .vscode/

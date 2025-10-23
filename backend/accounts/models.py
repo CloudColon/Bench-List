@@ -32,12 +32,12 @@ class CustomUserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
     """Custom user model with email as the unique identifier"""
-    
+
     ROLE_CHOICES = (
         ('admin', 'Admin'),
         ('company_user', 'Company User'),
     )
-    
+
     email = models.EmailField(unique=True, max_length=255)
     first_name = models.CharField(max_length=150, blank=True)
     last_name = models.CharField(max_length=150, blank=True)
@@ -46,23 +46,61 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     date_joined = models.DateTimeField(default=timezone.now)
-    
+
     objects = CustomUserManager()
-    
+
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name']
-    
+
     class Meta:
         verbose_name = 'User'
         verbose_name_plural = 'Users'
-    
+
     def __str__(self):
         return self.email
-    
+
     def get_full_name(self):
         """Return the first_name and last_name with a space in between"""
         return f'{self.first_name} {self.last_name}'.strip()
-    
+
     def get_short_name(self):
         """Return the short name for the user"""
         return self.first_name
+
+    def get_accessible_companies(self):
+        """Get all companies this user has access to"""
+        from companies.models import Company
+        if self.role == 'company_user':
+            # Company users see their own companies
+            return self.managed_companies.all()
+        else:
+            # Admins see companies they have approved access to
+            return Company.objects.filter(approved_admins=self)
+
+
+class AdminRequest(models.Model):
+    """Model to track admin access requests to companies"""
+
+    STATUS_CHOICES = (
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    )
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='admin_requests')
+    company = models.ForeignKey('companies.Company', on_delete=models.CASCADE, related_name='admin_access_requests')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    message = models.TextField(blank=True, help_text='Optional message from the admin')
+    response_message = models.TextField(blank=True, help_text='Response from company user')
+
+    requested_at = models.DateTimeField(auto_now_add=True)
+    responded_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        verbose_name = 'Admin Request'
+        verbose_name_plural = 'Admin Requests'
+        ordering = ['-requested_at']
+        unique_together = ['user', 'company']
+
+    def __str__(self):
+        return f"{self.user.email} -> {self.company.name} ({self.status})"

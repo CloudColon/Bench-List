@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { employeeAPI } from '@/lib/api';
 import { useRouter } from 'next/navigation';
+import ProfileDropdown from '@/components/ProfileDropdown';
 
 export default function EmployeesPage() {
   const { user, loading: authLoading } = useAuth();
@@ -155,9 +156,7 @@ export default function EmployeesPage() {
               <Link href="/dashboard" className="text-gray-700 hover:text-primary-600 font-medium">
                 Dashboard
               </Link>
-              <span className="text-gray-600">
-                {user.first_name} {user.last_name}
-              </span>
+              <ProfileDropdown />
             </div>
           </div>
         </div>

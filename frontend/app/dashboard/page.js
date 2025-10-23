@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { employeeAPI, companyAPI, requestAPI } from "@/lib/api";
 import { useRouter } from "next/navigation";
+import ProfileDropdown from "@/components/ProfileDropdown";
 
 export default function DashboardPage() {
   const { user, loading: authLoading } = useAuth();
@@ -142,9 +143,7 @@ export default function DashboardPage() {
               <Link href="/dashboard" className="text-primary-600 font-medium">
                 Dashboard
               </Link>
-              <span className="text-gray-600">
-                {user.first_name} {user.last_name}
-              </span>
+              <ProfileDropdown />
             </div>
           </div>
         </div>

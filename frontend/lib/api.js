@@ -63,11 +63,20 @@ api.interceptors.response.use(
 
 // Authentication APIs
 export const authAPI = {
-  register: (data) => api.post('/api/auth/register/', data),
+  registerCompanyUser: (data) => api.post('/api/auth/register/company-user/', data),
+  registerAdmin: (data) => api.post('/api/auth/register/admin/', data),
   login: (data) => api.post('/api/auth/login/', data),
   refreshToken: (refreshToken) => api.post('/api/auth/token/refresh/', { refresh: refreshToken }),
   getCurrentUser: () => api.get('/api/auth/users/me/'),
   changePassword: (data) => api.post('/api/auth/users/change_password/', data),
+};
+
+// Admin Request APIs
+export const adminRequestAPI = {
+  getAll: (params) => api.get('/api/auth/admin-requests/', { params }),
+  getById: (id) => api.get(`/api/auth/admin-requests/${id}/`),
+  getPending: () => api.get('/api/auth/admin-requests/pending/'),
+  respond: (id, data) => api.post(`/api/auth/admin-requests/${id}/respond/`, data),
 };
 
 // Company APIs

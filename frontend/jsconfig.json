@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"]
+    },
+    "target": "ES2017",
+    "module": "ESNext",
+    "lib": ["ES2017", "DOM", "DOM.Iterable"],
+    "jsx": "preserve",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "noEmit": true,
+    "isolatedModules": true,
+    "incremental": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": [
+    "**/*.js",
+    "**/*.jsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    ".next",
+    "out"
+  ]
+}

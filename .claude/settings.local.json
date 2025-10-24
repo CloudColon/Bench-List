@@ -10,7 +10,12 @@
       "Bash(powershell -Command \"Get-Content ''frontend/app/requests/page.js'' -Encoding UTF8 | Set-Content ''frontend/app/requests/page.js.tmp'' -Encoding UTF8; Move-Item -Force ''frontend/app/requests/page.js.tmp'' ''frontend/app/requests/page.js''\")",
       "Bash(timeout 30 npm run dev:*)",
       "Bash(powershell -Command \"Get-Content ''frontend/app/admin-requests/page.js'' -Encoding UTF8 | Set-Content ''frontend/app/admin-requests/page.js.tmp'' -Encoding UTF8; Move-Item -Force ''frontend/app/admin-requests/page.js.tmp'' ''frontend/app/admin-requests/page.js''\")",
-      "Bash(powershell -Command \"Get-Content ''frontend/app/admin-requests/page.js'' | Select-Object -Index 366,379\")"
+      "Bash(powershell -Command \"Get-Content ''frontend/app/admin-requests/page.js'' | Select-Object -Index 366,379\")",
+      "Bash(tree:*)",
+      "Bash(timeout 5 curl:*)",
+      "Bash(python test_api.py:*)",
+      "Bash(curl:*)",
+      "Bash(npm run build:*)"
     ],
     "deny": [],
     "ask": []

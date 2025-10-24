@@ -1,19 +1,19 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
-import { useRouter } from 'next/navigation';
-import { requestAPI } from '@/lib/api';
+import { resourceRequestAPI } from '@/lib/api';
 import ProfileDropdown from '@/components/ProfileDropdown';
 
-export default function RequestsPage() {
-  const { user, loading: authLoading } = useAuth();
+export default function ResourceRequestsPage() {
   const router = useRouter();
+  const { user, loading: authLoading } = useAuth();
+  const [activeTab, setActiveTab] = useState('received'); // received, sent, all
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [filter, setFilter] = useState('all');
   const [respondingTo, setRespondingTo] = useState(null);
   const [responseData, setResponseData] = useState({
     status: '',
@@ -31,19 +31,26 @@ export default function RequestsPage() {
     if (user) {
       fetchRequests();
     }
-  }, [user]);
+  }, [user, activeTab]);
 
   const fetchRequests = async () => {
     setLoading(true);
     setError('');
     try {
-      const response = await requestAPI.getAll();
+      let response;
+      if (activeTab === 'received') {
+        response = await resourceRequestAPI.getReceived();
+      } else if (activeTab === 'sent') {
+        response = await resourceRequestAPI.getSent();
+      } else {
+        response = await resourceRequestAPI.getAll();
+      }
       // Handle both paginated and non-paginated responses
       const data = response.data.results || response.data || [];
       setRequests(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error('Failed to fetch requests:', err);
-      setError('Failed to load bench requests');
+      setError('Failed to load resource requests');
       setRequests([]); // Set empty array on error
     } finally {
       setLoading(false);
@@ -58,16 +65,21 @@ export default function RequestsPage() {
     setError('');
 
     try {
-      await requestAPI.respond(respondingTo.id, responseData);
+      await resourceRequestAPI.respond(respondingTo.id, responseData);
       setRespondingTo(null);
       setResponseData({ status: '', response: '' });
-      fetchRequests();
+      fetchRequests(); // Refresh the list
     } catch (err) {
       console.error('Failed to respond to request:', err);
       setError(err.response?.data?.detail || 'Failed to respond to request');
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    return new Date(dateString).toLocaleDateString() + ' ' + new Date(dateString).toLocaleTimeString();
   };
 
   const getStatusBadgeClass = (status) => {
@@ -85,25 +97,16 @@ export default function RequestsPage() {
     }
   };
 
-  const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleDateString() + ' ' + new Date(dateString).toLocaleTimeString();
-  };
-
-  const filteredRequests = requests.filter(request => {
-    if (filter === 'all') return true;
-    return request.status === filter;
-  });
-
-  if (authLoading || !user) {
+  if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
-        </div>
+        <div className="text-xl">Loading...</div>
       </div>
     );
+  }
+
+  if (!user) {
+    return null;
   }
 
   return (
@@ -130,10 +133,10 @@ export default function RequestsPage() {
               <Link href="/post-resources" className="text-gray-700 hover:text-primary-600 font-medium">
                 Post Resources
               </Link>
-              <Link href="/resource-requests" className="text-gray-700 hover:text-primary-600 font-medium">
+              <Link href="/resource-requests" className="text-primary-600 font-medium">
                 Resource Requests
               </Link>
-              <Link href="/requests" className="text-primary-600 font-medium">
+              <Link href="/requests" className="text-gray-700 hover:text-primary-600 font-medium">
                 Employee Requests
               </Link>
               <Link href="/dashboard" className="text-gray-700 hover:text-primary-600 font-medium">
@@ -146,59 +149,54 @@ export default function RequestsPage() {
       </nav>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Employee Bench Requests</h1>
-          <p className="text-gray-600 mt-2">
-            Manage individual employee bench requests
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-gray-900">Resource Requests</h2>
+          <p className="mt-1 text-sm text-gray-600">
+            Manage incoming and outgoing requests for resource listings
           </p>
         </div>
 
-        {/* Filters */}
-        <div className="card mb-6">
-          <div className="flex gap-2">
+        {/* Tabs */}
+        <div className="mb-6 border-b border-gray-200">
+          <nav className="-mb-px flex space-x-8">
             <button
-              onClick={() => setFilter('all')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                filter === 'all'
-                  ? 'bg-primary-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
+              onClick={() => setActiveTab('received')}
+              className={`${
+                activeTab === 'received'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
             >
-              All ({requests.length})
+              Received
+              {activeTab === 'received' && requests.length > 0 && (
+                <span className="ml-2 bg-blue-100 text-blue-600 py-0.5 px-2 rounded-full text-xs">
+                  {requests.filter(r => r.status === 'pending').length}
+                </span>
+              )}
             </button>
             <button
-              onClick={() => setFilter('pending')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                filter === 'pending'
-                  ? 'bg-primary-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
+              onClick={() => setActiveTab('sent')}
+              className={`${
+                activeTab === 'sent'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
             >
-              Pending ({requests.filter(r => r.status === 'pending').length})
+              Sent
             </button>
             <button
-              onClick={() => setFilter('approved')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                filter === 'approved'
-                  ? 'bg-primary-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
+              onClick={() => setActiveTab('all')}
+              className={`${
+                activeTab === 'all'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
             >
-              Approved ({requests.filter(r => r.status === 'approved').length})
+              All
             </button>
-            <button
-              onClick={() => setFilter('rejected')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                filter === 'rejected'
-                  ? 'bg-primary-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              Rejected ({requests.filter(r => r.status === 'rejected').length})
-            </button>
-          </div>
+          </nav>
         </div>
 
         {/* Error Message */}
@@ -213,19 +211,28 @@ export default function RequestsPage() {
           <div className="text-center py-12">
             <div className="text-gray-600">Loading requests...</div>
           </div>
-        ) : filteredRequests.length === 0 ? (
+        ) : requests.length === 0 ? (
           <div className="card text-center py-12">
-            <p className="text-gray-600">No employee requests found.</p>
+            <p className="text-gray-600">
+              {activeTab === 'received' && 'No requests received yet.'}
+              {activeTab === 'sent' && 'No requests sent yet.'}
+              {activeTab === 'all' && 'No requests found.'}
+            </p>
+            {activeTab === 'sent' && (
+              <a href="/listings" className="btn-primary mt-4 inline-block">
+                Browse Listings
+              </a>
+            )}
           </div>
         ) : (
           <div className="space-y-4">
-            {filteredRequests.map((request) => (
+            {requests.map((request) => (
               <div key={request.id} className="card">
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <h3 className="text-lg font-semibold text-gray-900">
-                        {request.employee_name}
+                        {request.resource_listing_title}
                       </h3>
                       <span className={`${getStatusBadgeClass(request.status)} text-xs`}>
                         {request.status}
@@ -233,13 +240,13 @@ export default function RequestsPage() {
                     </div>
                     <div className="text-sm text-gray-600 space-y-1">
                       <p>
-                        <span className="font-medium">Role:</span> {request.employee_job_title}
-                      </p>
-                      <p>
-                        <span className="font-medium">Employee&apos;s Company:</span> {request.employee_company_name}
+                        <span className="font-medium">Resource Owner:</span> {request.resource_company_name}
                       </p>
                       <p>
                         <span className="font-medium">Requesting Company:</span> {request.requesting_company_name}
+                      </p>
+                      <p>
+                        <span className="font-medium">Resources:</span> {request.total_resources} employees
                       </p>
                       <p>
                         <span className="font-medium">Requested:</span> {formatDate(request.requested_at)}
@@ -252,19 +259,36 @@ export default function RequestsPage() {
                     </div>
                   </div>
 
-                  {/* Action buttons for pending requests */}
-                  {request.status === 'pending' && (
+                  {/* Action buttons for received requests */}
+                  {activeTab === 'received' && request.status === 'pending' && (
                     <button
                       onClick={() => {
                         setRespondingTo(request);
                         setResponseData({ status: '', response: '' });
                       }}
-                      className="btn btn-primary ml-4"
+                      className="btn-primary ml-4"
                     >
                       Respond
                     </button>
                   )}
                 </div>
+
+                {/* Skills */}
+                {request.skills_summary && (
+                  <div className="mb-4">
+                    <p className="text-xs text-gray-500 mb-2">Skills Requested:</p>
+                    <div className="flex flex-wrap gap-2">
+                      {request.skills_summary.split(',').slice(0, 8).map((skill, idx) => (
+                        <span
+                          key={idx}
+                          className="px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded"
+                        >
+                          {skill.trim()}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* Message */}
                 {request.message && (
@@ -281,11 +305,21 @@ export default function RequestsPage() {
                     <p className="text-sm text-gray-700">{request.response}</p>
                   </div>
                 )}
+
+                {/* View Listing Link */}
+                <div className="mt-4 pt-4 border-t">
+                  <a
+                    href={`/listings/${request.resource_listing}`}
+                    className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                  >
+                    View Full Listing →
+                  </a>
+                </div>
               </div>
             ))}
           </div>
         )}
-      </main>
+      </div>
 
       {/* Response Modal */}
       {respondingTo && (
@@ -296,8 +330,7 @@ export default function RequestsPage() {
             </h3>
 
             <div className="mb-4 p-3 bg-gray-50 rounded-md">
-              <p className="text-sm font-medium text-gray-900">{respondingTo.employee_name}</p>
-              <p className="text-xs text-gray-600">{respondingTo.employee_job_title}</p>
+              <p className="text-sm font-medium text-gray-900">{respondingTo.resource_listing_title}</p>
               <p className="text-xs text-gray-600 mt-1">
                 From: {respondingTo.requesting_company_name}
               </p>
@@ -357,14 +390,14 @@ export default function RequestsPage() {
                     setRespondingTo(null);
                     setResponseData({ status: '', response: '' });
                   }}
-                  className="btn btn-secondary"
+                  className="btn-secondary"
                   disabled={submitting}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="btn btn-primary"
+                  className="btn-primary"
                   disabled={submitting || !responseData.status}
                 >
                   {submitting ? 'Submitting...' : 'Submit Response'}

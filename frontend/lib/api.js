@@ -119,6 +119,30 @@ export const requestAPI = {
   delete: (id) => api.delete(`/api/requests/${id}/`),
 };
 
+// Resource Listing APIs
+export const resourceListingAPI = {
+  getAll: (params) => api.get('/api/resource-listings/', { params }),
+  getById: (id) => api.get(`/api/resource-listings/${id}/`),
+  getMyListings: () => api.get('/api/resource-listings/my_listings/'),
+  create: (data) => api.post('/api/resource-listings/', data),
+  update: (id, data) => api.put(`/api/resource-listings/${id}/`, data),
+  partialUpdate: (id, data) => api.patch(`/api/resource-listings/${id}/`, data),
+  updateStatus: (id, status) => api.patch(`/api/resource-listings/${id}/update_status/`, { status }),
+  delete: (id) => api.delete(`/api/resource-listings/${id}/`),
+};
+
+// Resource Request APIs
+export const resourceRequestAPI = {
+  getAll: (params) => api.get('/api/resource-requests/', { params }),
+  getById: (id) => api.get(`/api/resource-requests/${id}/`),
+  getPending: () => api.get('/api/resource-requests/pending/'),
+  getSent: () => api.get('/api/resource-requests/sent/'),
+  getReceived: () => api.get('/api/resource-requests/received/'),
+  create: (data) => api.post('/api/resource-requests/', data),
+  respond: (id, data) => api.post(`/api/resource-requests/${id}/respond/`, data),
+  delete: (id) => api.delete(`/api/resource-requests/${id}/`),
+};
+
 // Helper functions
 export const setAuthTokens = (access, refresh) => {
   localStorage.setItem('access_token', access);

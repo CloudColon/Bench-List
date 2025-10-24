@@ -135,10 +135,28 @@ export default function DashboardPage() {
                 Companies
               </Link>
               <Link
+                href="/listings"
+                className="text-gray-700 hover:text-primary-600 font-medium"
+              >
+                Listings
+              </Link>
+              <Link
+                href="/post-resources"
+                className="text-gray-700 hover:text-primary-600 font-medium"
+              >
+                Post Resources
+              </Link>
+              <Link
+                href="/resource-requests"
+                className="text-gray-700 hover:text-primary-600 font-medium"
+              >
+                Resource Requests
+              </Link>
+              <Link
                 href="/requests"
                 className="text-gray-700 hover:text-primary-600 font-medium"
               >
-                Requests
+                Employee Requests
               </Link>
               <Link href="/dashboard" className="text-primary-600 font-medium">
                 Dashboard
@@ -157,7 +175,7 @@ export default function DashboardPage() {
             Welcome back, {user.first_name}!
           </h1>
           <p className="text-gray-600 mt-2">
-            Here's an overview of your bench management system
+            Here&apos;s an overview of your bench management system
           </p>
         </div>
 

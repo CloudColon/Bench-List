@@ -150,6 +150,12 @@ export default function EmployeesPage() {
               <Link href="/companies" className="text-gray-700 hover:text-primary-600 font-medium">
                 Companies
               </Link>
+              <Link href="/listings" className="text-gray-700 hover:text-primary-600 font-medium">
+                Listings
+              </Link>
+              <Link href="/post-resources" className="text-gray-700 hover:text-primary-600 font-medium">
+                Post Resources
+              </Link>
               <Link href="/requests" className="text-gray-700 hover:text-primary-600 font-medium">
                 Requests
               </Link>
